@@ -268,14 +268,17 @@ class Bus(object):
             self.state = states.STARTED
             self.log('Bus STARTED')
         except (KeyboardInterrupt, SystemExit):
+            _traceback.print_stack()
             raise
         except Exception:
+            _traceback.print_stack()
             self.log('Shutting down due to error in start listener:',
                      level=40, traceback=True)
             e_info = sys.exc_info()[1]
             try:
                 self.exit()
             except Exception:
+                _traceback.print_stack()
                 # Any stop/exit errors will be logged inside publish().
                 pass
             # Re-raise the original error
@@ -295,6 +298,7 @@ class Bus(object):
             # "Waiting for child threads to terminate..." and then nothing.
             self.log('Bus EXITED')
         except Exception:
+            _traceback.print_stack()
             # This method is often called asynchronously (whether thread,
             # signal handler, console handler, or atexit handler), so we
             # can't just let exceptions propagate out unhandled.
@@ -302,6 +306,7 @@ class Bus(object):
             os._exit(EX_SOFTWARE)
 
         if exitstate == states.STARTING:
+            _traceback.print_stack()
             # exit() was called before start() finished, possibly due to
             # Ctrl-C because a start listener got stuck. In this case,
             # we could get stuck in a loop where Ctrl-C never exits the
